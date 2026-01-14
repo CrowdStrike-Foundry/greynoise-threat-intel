@@ -1,0 +1,74 @@
+app_id: fe89fa44c0c8441e8a1d3b60d6063411
+name: GreyNoise Threat Intel
+description: GreyNoise empowers defenders to work on the most urgent and critical threats without being overwhelmed by noisy, low-priority alerts. We provide real-time, verifiable threat intelligence powered by the largest and most sophisticated internet sensor network.
+logo: logo.png
+vendor: GreyNoise
+vendor_products:
+    - GreyNoise
+use_case: Threat intelligence
+manifest_version: "2023-05-09"
+ignored:
+    - .+/node_modules$
+    - .+/node_modules/.+
+    - .+/venv$
+    - .+/venv/.+
+ui:
+    homepage: ""
+    extensions: []
+    pages: {}
+    dashboards: {}
+    navigation: {}
+api_integrations:
+    - id: 64e8d4090d014a2e9b50b9821b7bc224
+      name: GreyNoise API
+      description: ""
+      path: api-integrations/GreyNoise_API.json
+rtr_scripts: []
+collections: []
+auth:
+    scopes:
+        - humio-auth-proxy:write
+    permissions: {}
+    roles: []
+functions:
+    - id: fb66a55435804df9b14e258e5348a24e
+      name: greynoise-ti-import-to-ng-siem
+      config: null
+      description: Import GreyNoise indicators into NGSIEM
+      path: functions/greynoise-ti-import-to-ng-siem
+      environment_variables: {}
+      handlers:
+        - name: greynoise-ti-import-bulk
+          description: Import GreyNoise indicators into NGSIEM
+          method: POST
+          api_path: /greynoise-ti-import-bulk
+          payload_type: ""
+          request_schema: schemas/request_schema.json
+          response_schema: schemas/response_schema.json
+          workflow_integration:
+            id: 7165d716b5c5476d8865ea73cd3b67f8
+            disruptive: false
+            system_action: false
+            tags:
+                - fe89fa44c0c8441e8a1d3b60d6063411
+                - GreyNoiseThreatIntelligence
+                - threat-intel
+          permissions: []
+      language: python
+      max_exec_duration_seconds: 900
+      max_exec_memory_mb: 1024
+workflows:
+    - id: 4b2c991c2af04239b67e11e18649a708
+      name: GreyNoise Indicator Import Scheduler
+      path: workflows/GreyNoise_Indicator_Import_Scheduler.yml
+      permissions: []
+parsers: []
+logscale:
+    saved_searches: []
+lookup_files: []
+docs:
+    id: 808e180fb7324756a89ecf78550bdb82
+    path: app_docs
+    entrypoint: README.md
+    links:
+        - greynoise2.png
