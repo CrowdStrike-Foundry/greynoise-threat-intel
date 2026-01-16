@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "repository": {
+      "type": "string",
+      "description": "Repository name for file upload",
+      "default": "search-all"
+    },
+    "api_key": {
+      "type": "string",
+      "description": "GreyNoise API key",
+      "default": ""
+    },
+    "query": {
+      "type": "string",
+      "description": "GreyNoise query",
+      "default": "last_seen:1d -classification:unknown"
+    },
+    "max_indicator_count": {
+      "type": "string",
+      "description": "Maximum number of indicators to import",
+      "default": "1000000"
+    }
+  },
+  "required": [
+    "api_key"
+  ]
+}
