@@ -1,0 +1,4 @@
+crowdstrike-foundry-function==1.1.4
+greynoise==3.0.2
+crowdstrike-falconpy
+ipaddress==1.0.23
