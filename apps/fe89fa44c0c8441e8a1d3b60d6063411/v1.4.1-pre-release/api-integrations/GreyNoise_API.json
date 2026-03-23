@@ -21,7 +21,7 @@
     "/v1/cve/{cve_id}": {
       "get": {
         "description": "This API endpoint takes a single valid CVE ID and checks GreyNoise for ITW exploitation details.\n",
-        "operationId": "GreyNoise - Retrieve CVE Information",
+        "operationId": "GreyNoise TI - Retrieve CVE Information",
         "parameters": [
           {
             "in": "path",
@@ -277,7 +277,7 @@
     "/v2/experimental/gnql/stats": {
       "get": {
         "description": "This API endpoint takes a valid GNQL (GreyNoise Query) and provides high-level stats on the query response.",
-        "operationId": "GreyNoise - GNQL Stats",
+        "operationId": "GreyNoise TI - GNQL Stats",
         "parameters": [
           {
             "description": "Number of top aggregates to grab",
@@ -610,7 +610,7 @@
     "/v3/cves": {
       "post": {
         "description": "This API endpoint takes a list of valid CVE IDs and checks GreyNoise for ITW exploitation details for each CVE submitted.",
-        "operationId": "GreyNoise - Bulk CVE Lookup",
+        "operationId": "GreyNoise TI - Bulk CVE Lookup",
         "requestBody": {
           "content": {
             "application/json": {
@@ -827,7 +827,7 @@
     "/v3/gnql": {
       "get": {
         "description": "This API endpoint takes a valid GNQL (GreyNoise Query) and responds with a full list of IPs that match the provided query.",
-        "operationId": "GreyNoise - GNQL v3 Query",
+        "operationId": "GreyNoise TI - GNQL v3 Query",
         "parameters": [
           {
             "description": "GNQL query string",
@@ -3674,7 +3674,7 @@
     "/v3/gnql/metadata": {
       "get": {
         "description": "This API endpoint takes a valid GNQL (GreyNoise Query) and responds with a full list of IPs that match the provided query.  For this endpoint, the \"raw_data\" portion of the response is removed to allow for smaller query responses.  Full details can be retrieved using the GNQL v3 Query Action or performing a Full IP Lookup.",
-        "operationId": "GreyNoise - GNQL v3 Metadata Query",
+        "operationId": "GreyNoise TI - GNQL v3 Metadata Query",
         "parameters": [
           {
             "description": "Comma-separated list of fields to exclude from the response. The 'raw_data' field is automatically excluded and cannot be included.",
@@ -6355,7 +6355,7 @@
     "/v3/ip": {
       "post": {
         "description": "This API endpoint takes a list of IPs and returns all intel that GreyNoise has for each IP.  If using the QUICK parameter, only summary data is provided.",
-        "operationId": "GreyNoise - IP Lookup - Multi",
+        "operationId": "GreyNoise TI - IP Lookup - Multi",
         "parameters": [
           {
             "in": "query",
@@ -6896,7 +6896,7 @@
     "/v3/ip/{ip}": {
       "get": {
         "description": "This API endpoint takes a single IP and returns all intel that GreyNoise has for the provided IP.  If using the QUICK parameter, only summary data is provided.",
-        "operationId": "GreyNoise - IP Lookup",
+        "operationId": "GreyNoise TI - IP Lookup",
         "parameters": [
           {
             "in": "path",
@@ -7528,7 +7528,7 @@
     "/v3/noise/ips/{ip}/timeline": {
       "get": {
         "description": "This API endpoint provides a daily output for observed activity for a provided IP.  The field parameter defines which set of information is return, such as the daily classification changes for the IP.",
-        "operationId": "GreyNoise - IP Timeline Field Summary",
+        "operationId": "GreyNoise TI - IP Timeline Field Summary",
         "parameters": [
           {
             "in": "path",
@@ -7761,7 +7761,7 @@
     "/v3/tags": {
       "get": {
         "description": "This API endpoint provides a full list of all Tags within GreyNoise (when no params are used) or provides back single tag details based on the submitted parameters.",
-        "operationId": "GreyNoise - List Tags",
+        "operationId": "GreyNoise TI - List Tags",
         "parameters": [
           {
             "description": "Filter tags by associated CVE",
