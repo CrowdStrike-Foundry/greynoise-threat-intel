@@ -1,4 +1,4 @@
-name: GreyNoise Indicator Import Scheduler
+name: GreyNoise Indicator Import Scheduler Workflow
 parameters:
     actions:
         configuration:

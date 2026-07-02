@@ -1,15 +1,17 @@
-from crowdstrike.foundry.function import APIError, Function, Request, Response
-from falconpy import NGSIEM
-from greynoise.api import GreyNoise, APIConfig
-import tempfile
-import os
 import csv
 import gc
+import os
+import tempfile
 from typing import Dict
+
+from crowdstrike.foundry.function import APIError, Function, Request, Response
+from falconpy import NGSIEM
+from greynoise.api import APIConfig, GreyNoise
 
 func = Function.instance()
 
-INTEGRATION_NAME = "CrowdStrike Foundry v1.1.0"
+INTEGRATION_NAME = "CrowdStrike Foundry v1.2.0"
+EXCLUDE_FIELDS = "destination_asns,destination_cities,destination_countries,destination_country_codes,tags.details"
 
 # Define file name and csv headers
 FILE_NAME = "greynoise_indicators"
@@ -52,7 +54,8 @@ def get_ip_tag_names(tags: list) -> str:
     """
     # Use list comprehension for better performance
     return ";".join(
-        f"{tag.get('name', '')} ({tag.get('intention', '')} - {tag.get('category', '')})" for tag in tags[:10]
+        f"{tag.get('name', '')} ({tag.get('intention', '')} - {tag.get('category', '')})"
+        for tag in tags[:10]
     )
 
 
@@ -123,18 +126,22 @@ def process_file(logger, temp_dir, api_key, query, max_indicator_count):
             # Write header
             writer.writerow(FILE_HEADERS)
 
-            if max_indicator_count < 10000:
+            if max_indicator_count < 5000:
                 size = max_indicator_count
             else:
-                size = 10000
+                size = 5000
 
             # Query GreyNoise API - first page
             logger.info(f"Querying GreyNoise API with query: '{query}'")
-            response = gn.query(query=query, exclude_raw=True, size=size)
+            response = gn.query(
+                query=query, exclude_raw=True, size=size, exclude_fields=EXCLUDE_FIELDS
+            )
 
             # Cache metadata to avoid repeated dictionary access
             request_metadata = response.get("request_metadata", {})
-            logger.info(f"GreyNoise Query Indicator Count: {request_metadata.get('count', 0)}")
+            logger.info(
+                f"GreyNoise Query Indicator Count: {request_metadata.get('count', 0)}"
+            )
 
             scroll = request_metadata.get("scroll", None)
             complete = request_metadata.get("complete", True)
@@ -162,7 +169,9 @@ def process_file(logger, temp_dir, api_key, query, max_indicator_count):
                 total_records += len(batch_data)
                 logger.info(f"Processed {processed_count} records so far")
                 file_size = os.path.getsize(output_path)
-                logger.info(f"CSV file size: {file_size} bytes ({file_size / 1024 / 1024:.2f} MB)")
+                logger.info(
+                    f"CSV file size: {file_size} bytes ({file_size / 1024 / 1024:.2f} MB)"
+                )
 
                 # Clear the batch data to free memory
                 del batch_data, rows_to_write
@@ -181,7 +190,13 @@ def process_file(logger, temp_dir, api_key, query, max_indicator_count):
             while not complete and processed_count < max_indicator_count:
                 logger.info(f"Getting next page of results (batch {batch_num})")
                 try:
-                    response = gn.query(query=query, exclude_raw=True, size=size, scroll=scroll)
+                    response = gn.query(
+                        query=query,
+                        exclude_raw=True,
+                        size=size,
+                        scroll=scroll,
+                        exclude_fields=EXCLUDE_FIELDS,
+                    )
 
                     if "data" in response:
                         batch_data = response["data"]
@@ -208,7 +223,9 @@ def process_file(logger, temp_dir, api_key, query, max_indicator_count):
                         # Only check file size every 5 batches to reduce I/O overhead
                         if batch_num % 5 == 0:
                             file_size = os.path.getsize(output_path)
-                            logger.info(f"CSV file size: {file_size} bytes ({file_size / 1024 / 1024:.2f} MB)")
+                            logger.info(
+                                f"CSV file size: {file_size} bytes ({file_size / 1024 / 1024:.2f} MB)"
+                            )
 
                         # Clear batch data to free memory
                         del batch_data, rows_to_write
@@ -242,7 +259,9 @@ def process_file(logger, temp_dir, api_key, query, max_indicator_count):
         # Verify file was created
         if os.path.exists(output_path):
             file_size = os.path.getsize(output_path)
-            logger.info(f"CSV file created successfully. Size: {file_size} bytes ({file_size / 1024 / 1024:.2f} MB)")
+            logger.info(
+                f"CSV file created successfully. Size: {file_size} bytes ({file_size / 1024 / 1024:.2f} MB)"
+            )
         else:
             logger.error("CSV file was not created")
             raise FileNotFoundError("CSV file was not created")
@@ -286,23 +305,32 @@ def on_post(request: Request, config: Dict[str, object] | None, logger) -> Respo
             # Process
             logger.info(f"Processing file: {FILE_NAME}")
             try:
-                output_path = process_file(logger, temp_dir, api_key, query, max_indicator_count)
+                output_path = process_file(
+                    logger, temp_dir, api_key, query, max_indicator_count
+                )
                 if not os.path.exists(output_path):
                     logger.error(f"File does not exist: {output_path}")
                     raise FileNotFoundError("File does not exist")
 
                 logger.info(f"Uploading file to NGSIEM: {output_path}")
-                response = ngsiem.upload_file(lookup_file=output_path, repository=repository)
+                response = ngsiem.upload_file(
+                    lookup_file=output_path, repository=repository
+                )
 
                 if 400 <= response["status_code"] < 500:
                     # Log the raw response for troubleshooting if error
                     logger.info(f"API response: {response}")
 
-                    error_message = response.get("error", {}).get("message", "Unknown error")
+                    error_message = response.get("error", {}).get(
+                        "message", "Unknown error"
+                    )
                     return Response(
                         code=response["status_code"],
                         errors=[
-                            APIError(code=response["status_code"], message=f"NGSIEM upload error: {error_message}")
+                            APIError(
+                                code=response["status_code"],
+                                message=f"NGSIEM upload error: {error_message}",
+                            )
                         ],
                     )
                 logger.info(f"File uploaded successfully to repository: {repository}")
@@ -315,8 +343,16 @@ def on_post(request: Request, config: Dict[str, object] | None, logger) -> Respo
                     }
                 )
             except Exception as e:
-                logger.error(f"Error processing file {FILE_NAME}: {str(e)}", exc_info=True)
-                results.append({"file": f"ti_{FILE_NAME}.csv", "status": "error", "message": str(e)})
+                logger.error(
+                    f"Error processing file {FILE_NAME}: {str(e)}", exc_info=True
+                )
+                results.append(
+                    {
+                        "file": f"ti_{FILE_NAME}.csv",
+                        "status": "error",
+                        "message": str(e),
+                    }
+                )
 
         logger.info("NGSIEM CSV import process completed")
         return Response(body={"results": results}, code=200)

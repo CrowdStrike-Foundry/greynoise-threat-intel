@@ -58,9 +58,9 @@ functions:
       max_exec_duration_seconds: 900
       max_exec_memory_mb: 1024
 workflows:
-    - id: 4b2c991c2af04239b67e11e18649a708
-      name: GreyNoise Indicator Import Scheduler
-      path: workflows/GreyNoise_Indicator_Import_Scheduler.yml
+    - id: 4b2c991c2af04239b67e11e18649a709
+      name: GreyNoise Indicator Import Scheduler Workflow
+      path: workflows/GreyNoise_Indicator_Import_Scheduler_Workflow.yml
       permissions: []
 parsers: []
 logscale:
