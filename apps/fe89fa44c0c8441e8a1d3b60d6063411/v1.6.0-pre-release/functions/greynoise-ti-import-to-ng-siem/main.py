@@ -10,7 +10,7 @@ from greynoise.api import APIConfig, GreyNoise
 
 func = Function.instance()
 
-INTEGRATION_NAME = "CrowdStrike Foundry v1.2.0"
+INTEGRATION_NAME = "CrowdStrike Foundry v2.1.0"
 EXCLUDE_FIELDS = "destination_asns,destination_cities,destination_countries,destination_country_codes,tags.details"
 
 # Define file name and csv headers
@@ -282,7 +282,7 @@ def on_post(request: Request, config: Dict[str, object] | None, logger) -> Respo
         # Get parameters
         repository = request.body.get("repository", "search-all").strip()
         api_key = request.body.get("api_key", "").strip()
-        query = request.body.get("query", "last_seen:1d").strip()
+        query = request.body.get("query", "last_seen:1d -classification:unknown").strip()
 
         max_indicator_count = request.body.get("max_indicator_count", "100000").strip()
         if max_indicator_count.isdigit():

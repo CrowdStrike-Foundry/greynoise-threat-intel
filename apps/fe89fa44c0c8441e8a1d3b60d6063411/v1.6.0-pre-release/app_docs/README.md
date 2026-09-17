@@ -45,6 +45,6 @@ After installing this app, you can find its workflow in **Fusion SOAR** > **Work
 - Runs automatically at 3:00 AM Eastern Time (America/New_York) every day
 - Can also be triggered manually through the CrowdStrike platform
 
-The source code for this app can be found on GitHub: [https://github.com/GreyNoise-Intelligence/greynoise-crowdstrike-foundry](https://github.com/GreyNoise-Intelligence/greynoise-crowdstrike-foundry)] 
+For assistance, please reach out to [support@greynoise.io](support@greynoise.io).
 
 
