@@ -18,11 +18,7 @@ ui:
     pages: {}
     dashboards: {}
     navigation: {}
-api_integrations:
-    - id: 64e8d4090d014a2e9b50b9821b7bc224
-      name: GreyNoise API
-      description: ""
-      path: api-integrations/GreyNoise_API.json
+api_integrations: []
 rtr_scripts: []
 collections: []
 auth:
