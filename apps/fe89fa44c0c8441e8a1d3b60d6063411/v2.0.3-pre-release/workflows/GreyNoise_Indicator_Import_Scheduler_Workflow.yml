@@ -11,10 +11,13 @@ parameters:
                         default_value: "100000"
                     query:
                         required: false
-                        default_value: last_seen:1d
+                        default_value: "last_seen:1d -classification:unknown"
                     repository:
                         required: false
                         default_value: search-all
+                    include_callback_feed:
+                        required: false
+                        default_value: false
 provision_on_install: true
 trigger:
     next:

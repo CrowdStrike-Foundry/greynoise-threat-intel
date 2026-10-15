@@ -9,8 +9,7 @@
     },
     "api_key": {
       "type": "string",
-      "description": "GreyNoise API key",
-      "default": ""
+      "description": "GreyNoise API key"
     },
     "query": {
       "type": "string",
@@ -20,7 +19,12 @@
     "max_indicator_count": {
       "type": "string",
       "description": "Maximum number of indicators to import",
-      "default": "1000000"
+      "default": "100000"
+    },
+    "include_callback_feed": {
+      "type": "boolean",
+      "description": "When set to true, a second ti_greynoise_callback feed will be created with the callback feed data",
+      "default": false
     }
   },
   "required": [
