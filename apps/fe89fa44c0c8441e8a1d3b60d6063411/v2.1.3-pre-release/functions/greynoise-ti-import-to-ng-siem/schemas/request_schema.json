@@ -18,12 +18,11 @@
     },
     "max_indicator_count": {
       "type": "string",
-      "description": "Maximum number of indicators to import",
-      "default": "100000"
+      "description": "Maximum number of indicators to import"
     },
     "include_callback_feed": {
       "type": "boolean",
-      "description": "When set to true, a second ti_greynoise_callback feed will be created with the callback feed data",
+      "description": "When true, ti_greynoise_callback_indicators.csv contains callback feed data. When false, that lookup is overwritten with the column headers and one blank row.",
       "default": false
     }
   },

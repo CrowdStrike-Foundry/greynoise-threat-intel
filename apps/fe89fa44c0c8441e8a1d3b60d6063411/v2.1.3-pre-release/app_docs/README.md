@@ -9,8 +9,10 @@ This app has a Python function that downloads GreyNoise threat intelligence via 
 - (Optional) GreyNoise Callback / C2 Intelligence entitlement, required only if enabling the Callback Indicator feed
 
 ## Function Details
-- The function downloads indicators from the GreyNoise v3 GNQL Metadata API based on the provided query (default: `last_seen:1d -classification:unknown`)
-- The function then converts this data to a CSV file (`ti_greynoise_indicators.csv`) with the following format:
+- The function downloads GreyNoise's pre-built NG-SIEM lookup files with the GreyNoise Python SDK (`greynoise` 3.2.0). It does not page GNQL results or build the CSV itself.
+- For the GNQL feed, it requests the file for the provided query (default: `last_seen:1d -classification:unknown`). When `max_indicator_count` is set, that value is sent as the row limit. When it is omitted, GreyNoise applies its own cap.
+- If GreyNoise is still building a file, the function waits and checks again until the file is ready or 10 minutes have passed.
+- Every run downloads the file and overwrites `ti_greynoise_indicators.csv` in the specified NG-SIEM repository (default: `search-all`). The lookup file uses this format:
   - source.ip
   - source.ip.greynoise.is.actor
   - source.ip.greynoise.is.classification
@@ -25,7 +27,7 @@ This app has a Python function that downloads GreyNoise threat intelligence via 
   - source.ip.greynoise.bs.trust_level
   - source.ip.greynoise.bs.category
   - source.ip.greynoise.bs.name
-- Optionally, when `include_callback_feed` is set to `true` and the API key is entitled for Callback / C2 Intelligence, the function also downloads Callback Indicator IPs observed in the last 7 days via the GreyNoise Callback API and writes a second CSV (`ti_greynoise_callback_indicators.csv`) with the following format:
+- Every run also overwrites `ti_greynoise_callback_indicators.csv`. When `include_callback_feed` is `true`, that file is the pre-built callback feed for the last 7 days. A key without the Callback / C2 Intelligence entitlement fails the run. When the flag is `false`, the lookup is overwritten with the column headers and one blank row, so NG-SIEM keeps the file and it matches no indicators. The columns are:
   - source.ip
   - source.ip.greynoise.callback.is_stage2
   - source.ip.greynoise.callback.is_stage1
@@ -36,10 +38,7 @@ This app has a Python function that downloads GreyNoise threat intelligence via 
   - source.ip.greynoise.callback.scanner_count
   - source.ip.greynoise.callback.file_count
   - source.ip.greynoise.callback.source_country_code
-- The main indicator feed and optional Callback feed are processed independently. If one feed fails, any successfully generated feed is still uploaded.
-- Finally, it uploads lookup files to NG-SIEM using FalconPy:
-  - Uploads CSVs to the specified NG-SIEM repository (default: "search-all").
-  - Returns status information for each uploaded feed.
+- Both feeds are attempted before the function reports failure. A GreyNoise or NG-SIEM error fails the run and includes the API's message. A feed that already uploaded is left in place.
 
 ### Example queries:
 The function requires a GreyNoise Query using GNQL, which returns the indicators to import into NG-SIEM.
@@ -55,7 +54,8 @@ Some additional queries that may be useful:
 
 After installing this app, you can find its workflow in **Fusion SOAR** > **Workflows**. This workflow:
 
-- Runs automatically at 3:00 AM Eastern Time (America/New_York) every day
+- Runs automatically every hour, at the top of the hour, Eastern Time (America/New_York)
+- Skips a new run when the previous run is still in progress
 - Can also be triggered manually through the CrowdStrike platform
 
 For assistance, please reach out to [support@greynoise.io](support@greynoise.io).
